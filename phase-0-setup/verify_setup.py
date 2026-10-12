@@ -19,7 +19,7 @@ so you can test them without touching the cloud — see ``tests/test_units.py``.
 """
 
 from __future__ import annotations
-
+import re
 import json
 import sys
 from pathlib import Path
@@ -51,8 +51,18 @@ def parse_gcloud_config(raw: str) -> dict:
     # TODO: parse `raw` as JSON and return {"account": ..., "project": ...}
     #       from the "core" section. Return empty strings if raw is empty or a
     #       field is missing.
-    raise NotImplementedError("Phase 0: implement parse_gcloud_config()")
+    """raise NotImplementedError("Phase 0: implement parse_gcloud_config()")"""
+    if not raw or not raw.strip():
+        return {"account": "", "project": ""}
 
+    try:
+        data = json.loads(raw)
+        core = data.get("core", {})
+        account = core.get("account", "") or ""
+        project = core.get("project", "") or ""
+        return {"account": account, "project": project}
+    except (json.JSONDecodeError, AttributeError):
+        return {"account": "", "project": ""}
 
 def parse_repo_slug(remote_url: str) -> str:
     """Turn a GitHub remote URL into an ``owner/repo`` slug (no ``.git`` suffix).
@@ -69,8 +79,20 @@ def parse_repo_slug(remote_url: str) -> str:
     """
     # TODO: return "owner/repo" for both the HTTPS and SSH forms shown above.
     #       Strip any trailing ".git". Return "" if not a github.com URL.
-    raise NotImplementedError("Phase 0: implement parse_repo_slug()")
+    """raise NotImplementedError("Phase 0: implement parse_repo_slug()")"""
+    if not remote_url or "github.com" not in remote_url:
+        return ""
 
+    url = remote_url.strip()
+    if url.endswith(".git"):
+        url = url[:-4]
+
+    # Match https://github.com/owner/repo or git@github.com:owner/repo
+    match = re.search(r"github\.com[:/]([^/]+)/([^/]+)$", url)
+    if match:
+        return f"{match.group(1)}/{match.group(2)}"
+
+    return ""
 
 # --------------------------------------------------------------------------- #
 # Provided probes (do not modify)
