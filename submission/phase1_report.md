@@ -22,17 +22,17 @@ memory.
 **Your image size**, in MB, from `gcloud artifacts docker images list` (number only, e.g. `142`):
 
 <!--answer:image_size_mb-->
-TODO
+52
 <!--/answer-->
 
 **The custom VPC and subnet you created** (names only):
 
 <!--answer:vpc_name-->
-TODO
+echo-net
 <!--/answer-->
 
 <!--answer:subnet_name-->
-TODO
+echo-subnet
 <!--/answer-->
 
 ---
@@ -44,15 +44,18 @@ Copy these from `submission/phase1_report.json`. Cold is `cold_ms`; warm median 
 
 | Platform | Cold (ms) | Warm median (ms) |
 |---|---|---|
-| IaaS VM | <!--answer:vm_cold_ms-->TODO<!--/answer--> | <!--answer:vm_warm_median_ms-->TODO<!--/answer--> |
-| Cloud Run | <!--answer:cloudrun_cold_ms-->TODO<!--/answer--> | <!--answer:cloudrun_warm_median_ms-->TODO<!--/answer--> |
-| Cloud Function | <!--answer:function_cold_ms-->TODO<!--/answer--> | <!--answer:function_warm_median_ms-->TODO<!--/answer--> |
-
-Include your histogram or plot of the warm distribution below (an image, or the ASCII chart
+| IaaS VM | <!--answer:vm_cold_ms-->251.9<!--/answer--> | <!--answer:vm_warm_median_ms-->209.9<!--/answer--> |
+| Cloud Run | <!--answer:cloudrun_cold_ms-->148.1<!--/answer--> | <!--answer:cloudrun_warm_median_ms-->636.0<!--/answer--> |
+| Cloud Function | <!--answer:function_cold_ms-->182.3<!--/answer--> | <!--answer:function_warm_median_ms-->667.7<!--/answer--> |
 `measure.py` prints). This is read by a human, not the grader:
 
 <!--answer:latency_plot-->
-TODO
+[OK  ] vm        cold=  251.9ms  warm_median=  209.9ms
+             #############
+[OK  ] cloudrun  cold=  148.1ms  warm_median=  636.0ms
+             ######################################
+[OK  ] function  cold=  182.3ms  warm_median=  667.7ms
+             ########################################
 <!--/answer-->
 
 ---
@@ -71,14 +74,14 @@ hundred. For each of the three platforms, answer concretely:
 to the second question.)
 
 <!--answer:scaling_behaviour-->
-TODO
+The IaaS VM creates nothing automatically; load is absorbed by a single static instance constrained strictly by the hardware limits of the `--machine-type=e2-micro` size chosen. Cloud Run automatically scales container instances up and down based on incoming request volume, bounded by the `--max-instances=3` flag set during deployment. Cloud Functions similarly autoscales serverless instances automatically managed by Google Cloud infrastructure, governed by platform concurrency limits.
 <!--/answer-->
 
 **Deployment effort.** What did you have to build, configure and maintain to get each of the
 three running? (~100 words)
 
 <!--answer:deployment_effort-->
-TODO
+For the IaaS VM, I had to manually build a custom VPC, configure subnets, open firewall rules for SSH and port 8080, provision the VM instance, SSH in, install and authenticate Docker, and run the container detached. For Cloud Run, deployment was abstracted via Cloud Build and managed PaaS container deployment commands. For Cloud Functions, no containerization was necessary locally; deploying raw Python source code directly handled the build and serverless runtime setup automatically.
 <!--/answer-->
 
 ---
@@ -89,7 +92,9 @@ With Cloud Run and your Function both deployed, run `gcloud run services list` a
 **complete output** here, unedited:
 
 <!--answer:run_services_list-->
-TODO
+NAME           REGION       URL                                                 STATUS
+echo-bot       us-central1  https://echo-bot-1056378553243.us-central1.run.app  READY
+echo-function  us-central1  https://echo-function-byuqostqua-uc.a.run.app      READY
 <!--/answer-->
 
 Now explain what that output tells you about how your Function is actually being run, why its
@@ -97,5 +102,5 @@ cold start resembles Cloud Run's so closely, and what — if anything — genuin
 the two deployment paths. (~120 words)
 
 <!--answer:convergence_explanation-->
-TODO
+The output of `gcloud run services list` reveals that Cloud Functions gen 2 is built directly on top of Cloud Run under the hood. When you deploy a 2nd-generation Cloud Function from source, Google Cloud automatically packages it and provisions a corresponding underlying Cloud Run service. This explains why both services exhibit nearly identical architectural behavior, container execution models, and comparable cold/warm startup latencies. The primary difference is the developer experience: Cloud Run expects a pre-built container image, whereas Cloud Functions accepts raw source code and manages the build pack and runtime environment automatically.
 <!--/answer-->
