@@ -1,0 +1,30 @@
+{
+  "phase": "2",
+  "environment": {
+    "colab": true
+  },
+  "attention": {
+    "naive_ms": 241.368,
+    "vectorized_ms": 1.15,
+    "speedup": 209.89
+  },
+  "threads": {
+    "1": 3046.636,
+    "2": 2211.695,
+    "4": 2391.961,
+    "8": 2420.608
+  },
+  "devices": {
+    "cpu_ms": 425216.8,
+    "gpu_ms": 12825.6
+  },
+  "training": {
+    "steps": 2000,
+    "final_loss": 1.458,
+    "param_count": 4935680
+  },
+  "sample": "\nWorick it shall both is mose, give'd!\n\nServant:\nWhat father thing the saide flowers cornce with.\n\nThis Citizen:\nAnd sleep of York, any lordst,--\nThe boy lenty ash\nI am die a Paurey's throt just own am",
+  "model": {
+    "gcs_url": "https://storage.googleapis.com/eurecom-gpt-kiri-eurecomgpt/model.safetensors"
+  }
+}
